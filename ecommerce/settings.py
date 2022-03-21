@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Apps importados enquanto estiver em desenvolvimento
-    'debug_toolbar', # TODO: Remover o debug_toolbar
+    'debug_toolbar' if DEBUG else '',
 
     # Meus apps
     'pedido.apps.PedidoConfig',
@@ -57,9 +57,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    # TODO: Remover!!
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    
+    # Django debug toolbar
+    'debug_toolbar.middleware.DebugToolbarMiddleware' if DEBUG else '',
 ]
 
 ROOT_URLCONF = 'ecommerce.urls'
@@ -158,7 +158,6 @@ SESSION_SAVE_EVERY_REQUEST = False
 # SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickSerializer'
 
 # Debug Toolbar
-# TODO: Remover!!!
 if DEBUG:
     import os  # only if you haven't already imported this
     import socket  # only if you haven't already imported this
