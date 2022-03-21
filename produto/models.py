@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
+
 from PIL import Image
 
 
@@ -9,28 +11,41 @@ class Product(models.Model):
         verbose_name = 'Produto'
         verbose_name_plural = 'Produtos'
     
-    name = models.CharField(max_length=255)
-    short_description = models.TextField(max_length=255)
-    long_description = models.TextField()
+    name = models.CharField(max_length=255, verbose_name='Nome')
+    short_description = models.TextField(max_length=255, verbose_name='Descrição curta')
+    long_description = models.TextField(verbose_name='Descrição longa')
     image = models.ImageField(
         upload_to='produto_imagens/%Y/%m/',
         blank=True,
-        null=True)
-    # TODO: Anotar SlugField
-    slug = models.SlugField(unique=True)  # Serve como ID para a url aelk
-    marketing_price = models.FloatField()
-    promotional_marketing_price = models.FloatField(default=0)
+        null=True,
+        verbose_name='Imagem')
+    slug = models.SlugField(unique=True, blank=True, null=True)
+    marketing_price = models.FloatField(verbose_name='Preço')
+    promotional_marketing_price = models.FloatField(default=0, verbose_name='Preço Promocional')
     type_product = models.CharField(
         default='V',
         max_length=1,
-        choices=(  # Cria uma interface de escolha
+        choices=(  # Cria um campo de escolha
             ('V', 'Variável'),
             ('S', 'Simples'),
-        )
+        ),
+        verbose_name='Tipo do produto'
     )
 
+    def get_formated_price(self):
+        return f'R$ {self.marketing_price:.2f}'.replace('.', ',')
+    get_formated_price.short_description = 'Preço'
+    
+    def get_formated_promotional_price(self):
+        return f'R$ {self.promotional_marketing_price:.2f}'.replace('.', ',')
+    get_formated_promotional_price.short_description = 'Preço Promocional'
+
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+        if not self.slug:
+            slug = f"{slugify(self.name)}"
+            self.slug = slug
+
+        super().save(*args, **kwargs)   
 
         if not self.image:
             return
