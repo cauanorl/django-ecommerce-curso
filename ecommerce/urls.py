@@ -19,11 +19,16 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    # Minhas URLS
+    path('', include('produto.urls')),
+    path('perfil/', include('perfil.urls')),
+    path('pedido/', include('pedido.urls')),
 
 
 
-    # TODO: Remover!
-    path('__debug__/', include('debug_toolbar.urls'))
+    path('__debug__/', include('debug_toolbar.urls')) if settings.DEBUG else None,
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
