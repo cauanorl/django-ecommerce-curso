@@ -4,6 +4,8 @@ from django.utils.text import slugify
 
 from PIL import Image
 
+from utils import utils
+
 
 # Create your models here.
 class Product(models.Model):
@@ -21,7 +23,7 @@ class Product(models.Model):
         verbose_name='Imagem')
     slug = models.SlugField(unique=True, blank=True, null=True)
     marketing_price = models.FloatField(verbose_name='Preço')
-    promotional_marketing_price = models.FloatField(default=0, verbose_name='Preço Promocional')
+    promotional_marketing_price = models.FloatField(verbose_name='Preço Promocional', blank=True, null=True)
     type_product = models.CharField(
         default='V',
         max_length=1,
@@ -31,14 +33,6 @@ class Product(models.Model):
         ),
         verbose_name='Tipo do produto'
     )
-
-    def get_formated_price(self):
-        return f'R$ {self.marketing_price:.2f}'.replace('.', ',')
-    get_formated_price.short_description = 'Preço'
-    
-    def get_formated_promotional_price(self):
-        return f'R$ {self.promotional_marketing_price:.2f}'.replace('.', ',')
-    get_formated_promotional_price.short_description = 'Preço Promocional'
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -54,6 +48,17 @@ class Product(models.Model):
 
         self.resize_image(self.image.name, image_max_width)
     
+    def get_formated_price(self):
+        return utils.cash_filter(self.marketing_price)
+    get_formated_price.short_description = 'Preço'
+    
+    def get_formated_promotional_price(self):
+        if self.promotional_marketing_price:
+            return utils.cash_filter(self.promotional_marketing_price)
+        else:
+            return None
+    get_formated_promotional_price.short_description = 'Preço Promocional'
+
     @staticmethod
     def resize_image(img, max_width):
         img_path = settings.MEDIA_ROOT / img
