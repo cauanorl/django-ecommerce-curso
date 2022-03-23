@@ -24,7 +24,7 @@ class Product(models.Model):
     slug = models.SlugField(unique=True, blank=True, null=True)
     marketing_price = models.FloatField(verbose_name='Preço')
     promotional_marketing_price = models.FloatField(verbose_name='Preço Promocional', blank=True, null=True)
-    type_product = models.CharField(
+    variations = models.CharField(
         default='V',
         max_length=1,
         choices=(  # Cria um campo de escolha
@@ -39,7 +39,7 @@ class Product(models.Model):
             slug = f"{slugify(self.name)}"
             self.slug = slug
 
-        super().save(*args, **kwargs)   
+        super().save(*args, **kwargs)
 
         if not self.image:
             return

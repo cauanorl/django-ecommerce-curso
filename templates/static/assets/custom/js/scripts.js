@@ -15,10 +15,16 @@
         preco = this.options[this.selectedIndex].getAttribute('data-preco');
         preco_promocional = this.options[this.selectedIndex].getAttribute('data-preco-promocional');
 
-        variation_preco.innerHTML = preco;
-
-        if (variation_preco_promocional) {
-            variation_preco_promocional.innerHTML = preco_promocional;
+        console.log(preco_promocional)
+        if (!preco_promocional) {
+      }
+      else {
+         variation_preco.innerHTML = preco
+         variation_preco_promocional = preco
+   
+           if (variation_preco_promocional) {
+               variation_preco_promocional.innerHTML = preco_promocional;
+           }
         }
     })
 })();

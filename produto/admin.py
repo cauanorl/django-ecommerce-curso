@@ -11,7 +11,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     list_display = (
         'id', 'name', 'get_formated_price',
-        'get_formated_promotional_price', 'type_product')
+        'get_formated_promotional_price', 'variations')
     list_display_links = ('id', 'name')
 
     inlines = [
