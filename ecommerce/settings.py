@@ -157,6 +157,7 @@ SESSION_SAVE_EVERY_REQUEST = False
 # Serializer - Padrão JSON
 # SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickSerializer'
 
+
 # Debug Toolbar
 if DEBUG:
     import os  # only if you haven't already imported this
