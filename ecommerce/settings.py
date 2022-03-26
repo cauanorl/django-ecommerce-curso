@@ -154,6 +154,7 @@ SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
 # Salvar a cada requisição
 SESSION_SAVE_EVERY_REQUEST = False
 
+# TODO: Anotar (Sessões)
 # Serializer - Padrão JSON
 # SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickSerializer'
 

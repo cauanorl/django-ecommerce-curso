@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load om_filters %}
 
 {% block title %}Carrinho{% endblock %}
 
@@ -9,35 +10,48 @@
           <h3>Carrinho de compras</h3>
           <p class="lead">Os produtos, quantidades e preços que você escolheu.</p>
 
-          <div class="table-responsive">
-              <table class="table">
-                  <tr>
-                      <th class="d-none d-lg-block">Imagem</th>
-                      <th>Produto</th>
-                      <th>V.</th>
-                      <th>QTD.</th>
-                      <th>Total</th>
-                  </tr>
+          {% for item in request.session.cart.values %}
+
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <th class="d-none d-lg-block">Image</th>
+                        <th>Produto</th>
+                        <th>V.</th>
+                        <th>QTD.</th>
+                        <th>Total</th>
+                    </tr>
 
 
-                  <tr>
-                      <td class="d-none d-lg-block">
-                          <img class="cart-img" src="imgs/7eb9d706-b8e3-48d0-957e-25f4a722f944.jpg">
-                      </td>
-                      <td>
-                          Nome do produto que o cliente está comprando
-                          <a class="ml-3" href="#">
-                              <i class="fas fa-times-circle text-danger" aria-hidden="true"></i>
-                          </a>
-                      </td>
-                      <td>Variação</td>
-                      <td>2x</td>
-                      <td>R$ 10500,59</td>
-                  </tr>
+                    <tr>
+                        <td class="d-none d-lg-block">
+                          {% if item.image %}
+                            <img class="cart-img" alt='{{ item.image }}' src="{{ item.image }}">
+                          {% else %}
+
+                          {% endif %}
+                        </td>
+                        <td>
+                            Nome do produto que o cliente está comprando
+                            <a class="ml-3" href="#">
+                                <i class="fas fa-times-circle text-danger" aria-hidden="true"></i>
+                            </a>
+                        </td>
+                        <td>Variação</td>
+                        <td>{{ item.quantity }}</td>
+                        {% if item.promotional_price_total %} 
+                          <td>{{ item.promotional_price_total|cash_filter }}</td>
+                        {% else %}
+                          <td> {{ item.price_total|cash_filter }} </td>
+                        {% endif %}
+                    </tr>
 
 
-              </table>
-          </div>
+                </table>
+            </div>
+
+          {% endfor %}
+
       </div>
   </div>
 

@@ -92,6 +92,6 @@ class Variation(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
     price = models.FloatField()
     promotional_price = models.FloatField(default=0)
-    inventory = models.PositiveBigIntegerField(default=1)
+    stock = models.PositiveBigIntegerField(default=1)
 
     def __str__(self): return self.name or self.product.name
