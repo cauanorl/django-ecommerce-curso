@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load om_filters %}
+{% load orl_filters %}
 
 {% block title %}
   {{ product.name }}
@@ -13,7 +13,9 @@
           <div class="row no-gutters">
             <div class="col-lg-12">
               {% if product.image %}
-                <img class="img-fluid" src="{{ product.image.url }}">
+                <img class="img-fluid" src="{{ product.image.url }}" alt="{{ product.name }}">
+              {% else %}
+                <img class="img-fluid" src="{{ no_image }}" alt="{{ product.name }}">
               {% endif %}
             </div>
           </div>
@@ -33,7 +35,7 @@
 
               {% else %}
 
-                <span id="variation-preco" class="lead product-price">{{ product.marketing_price|cash_filter }}</span>
+                <span id="variation-preco-promocional" class="lead product-price">{{ product.marketing_price|cash_filter }}</span>
 
               {% endif %}
 
@@ -45,7 +47,7 @@
                   <select id="select-variacoes" name="vid" class="form-control form-control-lg">
                     {% for variation in variations %}
                       {% if variation.promotional_price %}
-                        <option data-preco="{{ variation.price|cash_filter }}"
+                        <option data-preco="{{ variation.price|cash_filter }}" 
                                 data-preco-promocional="{{ variation.promotional_price|cash_filter }}"
                                 value="{{ variation.id }}">
                                 {% if variation.name %}

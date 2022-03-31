@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load om_filters %}
+{% load orl_filters %}
 
 {% block title %}Inicio{% endblock %}
 
@@ -15,6 +15,10 @@
             {% if produto.image %}
               <a href="{% url 'produto:detalhe' produto.slug %}">
                 <img class="card-img-top" src="{{ produto.image.url }}" alt="{{ produto.name }}">
+              </a>
+            {% else %}
+              <a href="{% url 'produto:detalhe' produto.slug %}">
+                <img class="card-img-top" src="{{ no_image }}" alt="{{ produto.name }}">
               </a>
             {% endif %}
 

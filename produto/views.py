@@ -10,7 +10,7 @@ from django.views.generic import View
 
 from django.contrib import messages
 
-from pprint import pprint
+from django.conf import settings
 
 from . import models
 
@@ -21,6 +21,9 @@ class ListProducts(ListView):
     model = models.Product
     context_object_name = 'produtos'
     paginate_by = 10
+    extra_context = {
+        'no_image': '/media/sem-foto.jpg',
+    }
 
 
 class ProductDetails(DetailView):
@@ -28,6 +31,7 @@ class ProductDetails(DetailView):
     model = models.Product
     context_object_name = 'product'
     slug_url_kwarg = 'slug'
+    extra_context = ListProducts.extra_context
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -43,34 +47,27 @@ class ProductDetails(DetailView):
 
 
 class AddToCart(View):
+    extra_context = ListProducts.extra_context
     template_name = 'produto/cart.html'
 
+    def setup(self, request, *args, **kwargs):
+        return super().setup(request, *args, **kwargs)
+
     def get(self, request,*args, **kwargs):
+        insufficient_stock = False
+
         http_referer = self.request.META.get(
             'HTTP_REFERER', reverse('produto:lista'))
+
         variation_id = self.request.GET.get('vid')
 
-        insufficient_stock = False
-        
         if not variation_id:
             messages.error(request, 'Erro ao adicionar produto ao carrinho')
             return redirect(http_referer)
 
-        variation_object = get_object_or_404(models.Variation, id=variation_id)
-        product_object = variation_object.product
+        self.set_variable(variation_id)
 
-        variation_name = variation_object.name or ''
-        variation_price = variation_object.price
-        variation_promotional_price = variation_object.promotional_price
-        variation_stock = variation_object.stock
-
-        product_id = product_object.id
-        product_name = product_object.name
-        product_slug = product_object.slug
-        product_image = product_object.image.name or ''
-
-        # TODO: Anotar sobre as sessões no caderno
-        if variation_stock < 1:
+        if self.variation_stock < 1:
             messages.error(request, 'Produto sem estoque.')
             return redirect(http_referer)
 
@@ -81,59 +78,115 @@ class AddToCart(View):
         cart = self.request.session['cart']
 
         if variation_id in cart:
-            current_quantity = cart[variation_id]['quantity']
-            current_quantity += 1
-
-            if current_quantity > variation_stock:
-                messages.warning(
-                    request,
-                    f'Quantidade insuficiente para {current_quantity}x '
-                    f'no estoque do produto: "{product_name}".')
-                current_quantity = variation_stock
-                insufficient_stock = True
-            
-            cart[variation_id]['quantity'] = current_quantity
-            cart[variation_id]['price_total'] = current_quantity * variation_price
-            cart[variation_id]['promotional_price_total'] = (
-                current_quantity * variation_promotional_price)
+            cart, insufficient_stock = self.update_cart(cart, variation_id)
         else:
-            cart[variation_id] = {
-                'product_id': product_id,
-                'product_name': product_name,
-                'variation_name': variation_name,
-                'variation_id': variation_id,
-                'price': variation_price,
-                'promotional_price': variation_promotional_price,
-                'price_total': variation_price,
-                'promotional_price_total': variation_promotional_price,
-                'quantity': 1,
-                'slug': product_slug,
-                'image': product_image,
-            }
+            cart = self.create_cart(variation_id, cart)
 
         self.request.session['cart'] = cart
         self.request.session.save()
+
         if not insufficient_stock:
             messages.success(
                 request,
-                f'Produto {product_name} adicionado ao carrinho. '
+                f'Produto {self.product_name} {self.variation_name} adicionado ao carrinho. '
                 f'Quantidade: {cart[variation_id]["quantity"]}x')
 
         return redirect(http_referer)
 
+    def set_variable(self, vid):
+        self.variation_object = get_object_or_404(models.Variation, id=vid)
+        self.product_object = self.variation_object.product
+
+        self.variation_name = self.variation_object.name or ''
+        self.variation_price = self.variation_object.price
+        self.variation_promotional_price = self.variation_object.promotional_price
+        self.variation_stock = self.variation_object.stock
+
+        self.product_id = self.product_object.id
+        self.product_name = self.product_object.name
+        self.product_slug = self.product_object.slug
+        self.product_image = self.product_object.image or ''
+    
+    def create_cart(self, vid, cart):
+        cart[vid] = {
+            'product_id': self.product_id,
+            'product_name': self.product_name,
+            'variation_name': self.variation_name,
+            'variation_id': vid,
+            'price': self.variation_price,
+            'promotional_price': self.variation_promotional_price,
+            'price_total': self.variation_price,
+            'promotional_price_total': self.variation_promotional_price,
+            'quantity': 1,
+            'slug': self.product_slug,
+            'image': self.product_image.url if self.product_image else '',
+        }
+
+        return cart
+
+    def update_cart(self, cart, vid):
+        insufficient_stock = False
+
+        current_quantity = cart[vid]['quantity']
+        current_quantity += 1
+
+        if current_quantity > self.variation_stock:
+            messages.warning(
+                self.request,
+                f'Quantidade insuficiente para {current_quantity}x '
+                f'no estoque do produto: "{self.product_name}".')
+            current_quantity = self.variation_stock
+            insufficient_stock = True
+
+        cart[vid]['quantity'] = current_quantity
+        cart[vid]['price_total'] = current_quantity * self.variation_price
+        cart[vid]['promotional_price_total'] = (
+            current_quantity * self.variation_promotional_price)
+
+        return (cart, insufficient_stock)
+
 
 class Cart(View):
     template_name = 'produto/cart.html'
+    extra_context = ListProducts.extra_context
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
+        cart = request.session.get('cart', {})
+
+        cart = self.order_dict(cart)
+        self.extra_context.update({'cart': cart})
+
+        return render(request, self.template_name, self.extra_context)
+    
+    @staticmethod
+    def order_dict(cart):
+        cart_list = []
+        cart_ordered = {}
+
+        for key, item in cart.items():
+            cart_list.insert(0, {key: item})
+
+        for item in cart_list:
+            cart_ordered.update(item)
+
+        return cart_ordered
 
 
 class RemoveFromCart(View):
-    pass
+    def get(self, request, *args, **kwargs):
+        vid = self.kwargs.get('vid')
 
-
-
+        if request.session.get('cart'):
+            if self.request.session['cart'].get(vid):
+                item = self.request.session['cart'].pop(vid)
+                messages.warning(
+                    self.request,
+                    f'Produto: {item["product_name"]} {item["variation_name"]} '
+                    f'removido do carrinho.')
+                self.request.session.save()
+        
+        return redirect(self.request.META.get('HTTP_REFERER', reverse('produto:lista')))
+        
 
 class Finish(View):
     pass
