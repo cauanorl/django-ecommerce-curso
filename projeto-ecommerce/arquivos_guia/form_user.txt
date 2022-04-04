@@ -1,4 +1,4 @@
-Usuário novo:
+Usuário novo: Ok
     usuário já existe?
         erro
     email já existe?

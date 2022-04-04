@@ -188,5 +188,5 @@ class RemoveFromCart(View):
         return redirect(self.request.META.get('HTTP_REFERER', reverse('produto:lista')))
         
 
-class Finish(View):
+class Resume(View):
     pass

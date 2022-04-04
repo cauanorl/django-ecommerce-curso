@@ -7,9 +7,9 @@ class Pay(View):
     pass
 
 
-class CloseOrder(View):
+class SaveOrder(View):
     pass
 
 
-class OrderDetails(View):
+class FinishRequest(View):
     pass

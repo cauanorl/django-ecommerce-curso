@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     # Apps importados enquanto estiver em desenvolvimento
     'debug_toolbar' if DEBUG else '',
 
+    # Apps importados
+    'crispy_forms',
+
     # Meus apps
     'pedido.apps.PedidoConfig',
     'produto.apps.ProdutoConfig',
@@ -167,6 +170,9 @@ if DEBUG:
     INTERNAL_IPS = [
         ip[: ip.rfind('.')] + '.1' for ip in ips] + ['127.0.0.1', '10.0.2.2']
 
+
+# Crispy Forms
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
