@@ -42,29 +42,47 @@ def validate_password(password, password2):
 def check_username(new_username=None):
     username_errors = {}
 
-    user_is_repeated = User.objects.all().filter(username=new_username)
-    if user_is_repeated:
+    user_already_exists = User.objects.all().filter(username=new_username)
+    if user_already_exists:
         username_errors.update({'username': 'Nome de usuário ja está em uso.'})
     if not new_username:
         username_errors.update({'username': 'Nome de usuário não pode ser em branco.'})
+    if len(new_username) < 6:
+        username_errors.update({'username': 'Nome de usuário não pode ter menos que 6 caracteres.'})
     
     return username_errors
 
 
+def check_email(new_email=None):
+    email_errors = {}
+    
+    email_already_exists = User.objects.all().filter(email=new_email)
+    if email_already_exists:
+        email_errors.update({'email': 'Esse email já foi cadastrado.'})
+    if not new_email:
+        email_errors.update({'email': 'Email não pode ser em branco.'})
+
+    return email_errors
+
+
 def validate_fields(datas, update_user=None):
     error_msgs = {}
+    user = update_user
 
-    if datas['password']:
+    if datas['password'] or datas['password2']:
         error_msgs.update(validate_password(
             datas['password'], datas['password2']))
-            
-    email_is_repeated = User.objects.all().filter(email=datas['email'])
-    if email_is_repeated:
-        error_msgs.update({'email': 'Esse email já foi cadastrado.'})
 
     if update_user:
-        user = update_user
-        if not user.username == datas['username']:
-            check_username(datas.get('username'))
+        if user.email != datas['email']:
+            error_msgs.update(check_email(datas.get('email')))
 
+        if user.username != datas['username']:
+            error_msgs.update(check_username(datas.get('username')))
+    else:
+        error_msgs.update(check_username(datas.get('username')))
+        error_msgs.update(check_email(datas.get('email')))
+        error_msgs.update(validate_password(
+            datas.get('password'), datas.get('password2')))
+        
     return error_msgs

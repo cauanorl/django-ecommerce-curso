@@ -8,28 +8,59 @@
 {% block content %}
 
   <div class="row">
-    <div class="col-lg">
+    {% if not user.is_authenticated %}
+      <div class="col-lg">
 
-      <h1>Login</h1>
-      <form action="" method="POST">
-        
-      </form>
-
-    </div>
-    <div class="col-lg">
-
-      <h1>Cadastro</h1>
-      <form action="" method="POST">
-        {% csrf_token %}
-        {{ userform|crispy }}
-        <div class="row">
-          <div class="col">
-            <button type="submit" class="btn btn-primary btn-block btn-lg">Registrar</button>
+        <h1>Login</h1>
+        <form action="" method="POST">
+          {% csrf_token %}
+            {{ loginform|crispy }}
+          <div class="row">
+            <div class="col">
+              <button type="submit" class="btn btn-primary btn-block btn-lg">Logar</button>
+            </div>
           </div>
-        </div>
-      </form>
-      
-    </div>
+        </form>
+
+      </div>
+      <div class="col-lg">
+
+        <h1>
+          CADASTRO
+        </h1>
+        <form action="" method="POST">
+          {% csrf_token %}
+          {{ userform|crispy }}
+          <div class="row">
+            <div class="col">
+              <button type="submit" class="btn btn-primary btn-block btn-lg">
+                Registrar
+              </button>
+            </div>
+          </div>
+        </form>
+        
+      </div>
+    {% else %}
+      <div class="col-lg">
+
+        <h1>
+          ATUALIZAR CONTA
+        </h1>
+        <form action="" method="POST">
+          {% csrf_token %}
+          {{ userform|crispy }}
+          <div class="row">
+            <div class="col">
+              <button type="submit" class="btn btn-primary btn-block btn-lg">
+                Atualizar
+              </button>
+            </div>
+          </div>
+        </form>
+        
+      </div>
+    {% endif %}
   </div>
 
 {% endblock %}
