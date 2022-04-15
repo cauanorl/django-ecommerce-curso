@@ -9,9 +9,9 @@ from django.views.generic.detail import DetailView
 from django.views.generic import View
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
-from django.conf import settings
-
+from perfil.models import UserProfile
 from . import models
 
 
@@ -189,4 +189,25 @@ class RemoveFromCart(View):
         
 
 class Resume(View):
-    pass
+    template_name = 'produto/summary.html'
+    extra_context = ListProducts.extra_context
+
+    def setup(self, request, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        if not self.request.user.is_authenticated:
+            self.render_template = redirect('perfil:login')
+            return
+        
+        cart = self.request.session.get('cart', {})
+        
+        self.extra_context.update({
+            "cart": cart,
+            "profile": UserProfile.objects.filter(user=self.request.user).first(),
+        })
+        self.render_template = render(
+            self.request, self.template_name, self.extra_context)
+
+    def get(self, *args, **kwargs):
+
+
+        return self.render_template

@@ -8,36 +8,32 @@
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-              <a class="nav-link" href="{% url 'produto:lista' %}">Home <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link" href="{% url 'perfil:login' %}">Perfil</a>
-          </li>
-          <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Dropdown
-              </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="#">Action</a>
-                  <a class="dropdown-item" href="#">Another action</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="#">Something else here</a>
-              </div>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link disabled" href="#">Disabled</a>
-          </li>
           {% if user.is_authenticated %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Usuário
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{% url 'perfil:login' %}">Perfil</a>
+                    <a class="dropdown-item" href="{% url 'produto:resumo' %}">Dados</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{% url 'perfil:logout' %}">Sair</a>
+                </div>
+            </li>
+          {% else %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'perfil:logout' %}">Logout</a>
+              <a href="{% url 'perfil:login' %}" class="nav-link">Entrar</a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'perfil:login' %}" class="nav-link">Criar conta</a>
             </li>
           {% endif %}
         </ul>
         {% if request.session.cart %}
           <div class="nav-cart ml-2 mr-4 mt-sm-2 mb-sm-2">
             <a class="nav-cart-icon" href="{% url 'produto:cart' %}">
+              Carrinho
               <span class="nav-cart-count mr-1">
                   {{ request.session.cart|sum_quantity }}x
               </span>

@@ -13,7 +13,7 @@ from . import forms
 
 
 # Create your views here.
-class BaseUserProfile(View):
+class FormLoginRegisterAndUpdateController(View):
     template_name = 'perfil/register.html'
 
     def setup(self, *args, **kwargs):
@@ -94,7 +94,6 @@ class BaseUserProfile(View):
                 auth.login(self.request, user) if user else None
 
                 self.request.session['cart'] = self.cart
-                self.request.session.save()
 
                 return redirect('perfil:login')
             return self.render_template
@@ -104,20 +103,13 @@ class BaseUserProfile(View):
         return self.render_template
 
 
-class FormLoginRegisterAndUpdateController(BaseUserProfile):
-    pass
-
-
-class Update(BaseUserProfile):
-    pass
-
-
-class Login(View):
-    pass
-
-
 def logout(request):
+    cart = copy.deepcopy(request.session.get('cart'))
+
     if request.user.is_authenticated:
         auth.logout(request)
+    
+    request.session['cart'] = cart
+    request.session.save()
     
     return redirect('perfil:login')

@@ -1,0 +1,66 @@
+{% load orl_filters %}
+
+<table class="table table-striped">
+
+  <thead>
+    <tr>
+      <th>Produto</th>
+      <th>Nome</th>
+      <th class="cash">Quantidade</th>
+      <th class="cash">Variação</th>
+      <th class="cash">Total</th>
+      <th class="action">Ações</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for item in cart.values %}
+      <tr>
+
+        {% if item.image %}
+          
+            <td>
+              <a href="{% url 'produto:detalhe' item.slug %}">
+                <img src="{{ item.image }}" alt="{{ item.name }}" class="cart-img">
+              </a>
+            </td>
+
+        {% else %}
+          
+            <td>
+              <a href="{% url 'produto:detalhe' item.slug %}">
+                <img src="{{ no_image }}" alt="{{ item.name }}" class="cart-img">
+              </a>
+            </td>
+
+        {% endif %}
+        
+        <td><a href="{% url 'produto:detalhe' item.slug %}">{{ item.product_name }}</a></td>
+        
+        {% if not item.promotional_price %}
+
+          <td class='cash'>
+            {{ item.quantity }}x de {{ item.price|cash_filter }}
+          </td>
+          <td class='cash'>{{ item.variation_name }}</td>
+          <td class='cash'>{{ item.price_total|cash_filter }}</td>
+
+        {% else %}
+
+          <td class='cash'>
+            {{ item.quantity }}x de {{ item.promotional_price|cash_filter}}
+          </td>
+          <td class='cash'>{{ item.variation_name }}</td>
+          <td class='cash'>{{ item.promotional_price_total|cash_filter }}</td>
+
+        {% endif %}
+        
+
+        <td class="action">
+          <a href="{% url 'produto:remover' item.variation_id %}" class="btn btn-danger">Remover</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+
+</table>
