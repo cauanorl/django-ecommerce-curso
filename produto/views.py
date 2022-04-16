@@ -204,10 +204,13 @@ class Resume(View):
             "cart": cart,
             "profile": UserProfile.objects.filter(user=self.request.user).first(),
         })
+
         self.render_template = render(
             self.request, self.template_name, self.extra_context)
 
     def get(self, *args, **kwargs):
-
+        if not self.extra_context['profile']:
+            messages.error(self.request, 'Você não cadastrou nenhum dado de entrega.')
+            return redirect(reverse('perfil:login'))
 
         return self.render_template

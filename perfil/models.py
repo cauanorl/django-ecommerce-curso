@@ -14,6 +14,7 @@ class UserProfile(models.Model):
         User, on_delete=models.CASCADE, verbose_name='Usuário')
     age = models.PositiveIntegerField(verbose_name='Idade')
     birth_date = models.DateField(verbose_name='Data de nascimento')
+    # TODO: Permitir apenas um cpf na base de dados
     cpf = models.CharField(
         max_length=11, help_text='Apenas valores numéricos.', verbose_name='CPF')
     address = models.CharField(max_length=50, verbose_name='Endereço')
