@@ -11,6 +11,8 @@ from django.views.generic import View
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
+from django.db.models import Q
+
 from perfil.models import UserProfile
 from . import models
 
@@ -215,3 +217,21 @@ class Resume(View):
             return redirect(reverse('perfil:login'))
 
         return self.render_template
+
+
+class Search(ListProducts):
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+
+        search_term = self.request.GET.get('term')
+
+        if not search_term:
+            return qs
+
+        qs = qs.filter(
+            Q(name__icontains=search_term) |
+            Q(short_description__icontains=search_term) |
+            Q(long_description__icontains=search_term)
+        )
+
+        return qs
