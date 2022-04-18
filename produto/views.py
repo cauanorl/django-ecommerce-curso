@@ -21,6 +21,7 @@ class ListProducts(ListView):
     model = models.Product
     context_object_name = 'produtos'
     paginate_by = 10
+    ordering = ['-id']
     extra_context = {
         'no_image': '/media/sem-foto.jpg',
     }

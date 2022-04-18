@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}{% endblock %}
-
-  {{ userform }}
+{% block title %}
+  {% if user.is_authenticated %}
+    {{ user }}
+  {% else %}
+    Login - Cadastro
+  {% endif %}
+{% endblock %}
 
 {% block content %}
 

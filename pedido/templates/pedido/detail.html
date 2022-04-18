@@ -1,17 +1,11 @@
 {% extends 'base.html' %}
 {% load orl_filters %}
 
-{% block title %} Pagamentos {% endblock %}
-
+{% block title %}
+  Detalhe do {{ purchase }}
+{% endblock %}
 
 {% block content %}
-
-  <div class="row">
-    <div class="col">
-        <h3>Escolha o método de pagamento</h3>
-        <p>Para o desenvolvedor: adicione seu método de pagamento preferido.</p>
-    </div>
-  </div>
 
   <div class="row">
     <div class="col">
@@ -39,15 +33,13 @@
           {% include 'partials/_order.html' %}
         </div>
 
-
-        <div class="row mt-4">
-            <div class="col">
-                <a href="#" class="btn btn-primary btn-block btn-lg">Pagar</a>
-            </div>
-        </div>
-
-
     </div>
   </div>
-
+  {% if purchase.status == 'C' %}
+    <div class="row mt-4">
+      <div class="col">
+          <a href="#" class="btn btn-primary btn-block btn-lg">Pagar</a>
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}

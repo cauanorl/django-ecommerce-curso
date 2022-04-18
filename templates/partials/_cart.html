@@ -1,3 +1,4 @@
+{% load static %}
 {% load orl_filters %}
 
 <table class="table table-striped">
@@ -29,7 +30,7 @@
           
             <td>
               <a href="{% url 'produto:detalhe' item.slug %}">
-                <img src="{{ no_image }}" alt="{{ item.name }}" class="cart-img">
+                <img src="{% static '/media/sem-foto.jpg' %}" alt="{{ item.name }}" class="cart-img">
               </a>
             </td>
 

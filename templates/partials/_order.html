@@ -1,4 +1,5 @@
 {% load orl_filters %}
+{% load static %}
 
 <table class="table table-striped">
 
@@ -26,7 +27,7 @@
         {% else %}
           
             <td>
-                <img src="{{ no_image }}" alt="{{ item.product }}" class="cart-img">
+                <img src="{% static '/media/sem-foto.jpg' %}" alt="{{ item.product }}" class="cart-img">
             </td>
 
         {% endif %}
@@ -40,7 +41,7 @@
           <td class='cash'>
             {{ item.quantity }}x de {{ item.price|cash_filter }}
           </td>
-          <td class='cash'>{{ item.variation_name }}</td>
+          <td class='cash'>{{ item.variation }}</td>
           <td class='cash'>{{ item.price_total|cash_filter }}</td>
 
         {% else %}
@@ -48,7 +49,7 @@
           <td class='cash'>
             {{ item.quantity }}x de {{ item.promotional_price|cash_filter}}
           </td>
-          <td class='cash'>{{ item.variation_name }}</td>
+          <td class='cash'>{{ item.variation }}</td>
           <td class='cash'>{{ item.promotional_price_total|cash_filter }}</td>
 
         {% endif %}

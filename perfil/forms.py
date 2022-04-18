@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from utils import utils
+from utils.validacpf import valida_cpf
 
 from django import forms
 
@@ -13,6 +14,22 @@ class UserProfileForm(forms.ModelForm):
         model = models.UserProfile
         fields = '__all__'
         exclude = ['user']
+    
+    cpf = forms.CharField(
+        label='CPF',
+        required=False,
+        max_length=11,
+    )
+
+    def clean(self, *args, **kwargs):
+
+        if not valida_cpf(self.cpf):
+            raise forms.ValidationError({"cpf": 'CPF é inválido.'})
+        
+        if models.UserProfile.objects.filter(cpf=self.cpf).exists():
+            raise forms.ValidationError({"cpf": 'CPF já foi registrado.'})
+
+        return super().clean(*args, **kwargs)
 
 
 class UserForm(forms.ModelForm):

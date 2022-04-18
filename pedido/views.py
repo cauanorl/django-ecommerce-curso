@@ -1,6 +1,4 @@
-from django.http import HttpResponse
-
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 
 from django.urls import reverse
 
@@ -8,30 +6,35 @@ from django.contrib import messages
 
 from django.views.generic import View
 from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 
 from utils import utils
 from produto.models import Variation
 from .models import Purchase, PurchaseItem
 
 
-class DispatchLoginRequired(View):
+class DispatchLoginRequiredMixin(View):
     def dispatch(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect(reverse('perfil:login'))
 
         return super().dispatch(*args, **kwargs)
 
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.filter(user=self.request.user)
+        return qs
 
-class Pay(DetailView, DispatchLoginRequired):
+
+class Pay(DetailView, DispatchLoginRequiredMixin):
     template_name = 'pedido/pay.html'
     model = Purchase
     pk_url_kwargs = 'pk'
     context_object_name = 'purchase'
+    extra_context = {
+        'no_image': '/media/sem-foto.jpg'
+    }
 
-    def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset()
-        qs = qs.filter(user=self.request.user)
-        return qs
     
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
@@ -90,7 +93,6 @@ class SaveOrder(View):
             'Favor olhar abaixo o novo estoque e o total.')
             return redirect(reverse('produto:resumo'))
 
-        # TODO: Salvar o pedido no banco de dados com os itens
         value_total = utils.sum_total(cart)
         quantity_total_cart = utils.sum_total(cart)
 
@@ -127,10 +129,15 @@ class SaveOrder(View):
         return redirect(reverse('pedido:pagar', kwargs={'pk': purchase.pk}))
 
 
-class FinishRequest(View):
-    pass
+class DetailOrder(DispatchLoginRequiredMixin, DetailView):
+    template_name = 'pedido/detail.html'
+    model = Purchase
+    pk_url_kwargs = 'pk'
 
 
-class ListRequests(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('Lista Pedidos')
+class ListOrders(DispatchLoginRequiredMixin, ListView):
+    model = Purchase
+    context_object_name = 'purchases'
+    template_name = 'pedido/list_orders.html'
+    paginate_by = 10
+    ordering = ['-id']
