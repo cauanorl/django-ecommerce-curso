@@ -223,15 +223,19 @@ class Search(ListProducts):
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
 
-        search_term = self.request.GET.get('term')
+        search_term = self.request.GET.get('term') or self.request.session['term']
 
         if not search_term:
             return qs
+        
+        self.request.session['term'] = search_term
 
         qs = qs.filter(
             Q(name__icontains=search_term) |
             Q(short_description__icontains=search_term) |
             Q(long_description__icontains=search_term)
         )
+
+        self.request.session.save()
 
         return qs
