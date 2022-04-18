@@ -8,6 +8,7 @@ class Purchase(models.Model):
         verbose_name_plural = 'Pedidos'
     
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    quantity_items = models.IntegerField()
     total = models.FloatField()
     status = models.CharField(
         default='C',
@@ -36,8 +37,10 @@ class PurchaseItem(models.Model):
     variation = models.CharField(max_length=255)
     variation_id = models.PositiveIntegerField()
     price = models.FloatField(default=0)
+    price_total = models.FloatField(default=0)
     promotional_price = models.FloatField(default=0, blank=True, null=True)
+    promotional_price_total = models.FloatField(default=0, blank=True, null=True)
     quantity = models.IntegerField(default=1)
     image = models.CharField(max_length=2000)
 
-    def __str__(self): return f'Item do {self.pedido}'
+    def __str__(self): return f'Item do {self.purchase}'
